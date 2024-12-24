@@ -38,6 +38,21 @@ function Clone-Repo {
     }
 }
 
+# Function to reset the remote origin to the pull origin if the repo is the current repository
+function Reset-RemoteOriginIfCurrentRepo {
+    param (
+        [string]$RepoName,
+        [string]$RepoPath
+    )
+    Write-Host "Resetting remote origin URL for repository $RepoName"
+    # If this repository matches the current repository
+    if ($ScriptDir -eq $RepoPath) {
+        $PullUrl = git remote get-url origin
+        Write-Host "Resetting push URL for origin in current repository $RepoName to $PullUrl"
+        git remote set-url --push origin $PullUrl
+    }
+}
+
 # Function to mirror repositories between source and target
 function Push-NewRemote {
     param (
@@ -56,6 +71,9 @@ function Push-NewRemote {
 
     # Push to target
     git push --mirror
+
+    # Reset the remote origin push URL if this is the current repository
+    Reset-RemoteOriginIfCurrentRepo -RepoName $RepoName -RepoPath $RepoPath
 }
 
 # Main function
@@ -86,6 +104,9 @@ function Main {
         # Push the repository to target
         Push-NewRemote -SrcRepo $SrcRepo -TargetRepo $TargetRepo
     }
+
+    ## Return shell to calling path
+    Set-Location -Path $CWD
 }
 
 # Run main function
