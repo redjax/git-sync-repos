@@ -1,12 +1,12 @@
 # Git Mirror
 
-Mirror git repositories from one remote to another (i.e. a Github repository to Codeberg). This is a Bash script, so only Linux hosts are supported currently.
+Mirror git repositories from one remote to another (i.e. a Github repository to Codeberg). On Windows hosts, run [`git_mirror_sync.ps1`](./git_mirror_sync.ps1), and on Linux run [`git_mirror_sync.sh`](./git_mirror_sync.sh).
 
 ## Setup
 
 - Copy [`mirrors.example`](./mirrors.example) to `mirrors` (this file should not have a file extension).
   - Edit `mirrors`, deleting the examples and adding your own mirror pairs.
-- Run the [`git_mirror_sync.sh`](./git_mirror_sync.sh) script.
+- Run the [`git_mirror_sync.sh`](./git_mirror_sync.sh) or [`git_mirror_sync.ps1`](./git_mirror_sync.ps1) script.
   - The script will read the `mirrors` file, create a `./repositories/` path, and clone each repository source, then mirror to the target.
 
 ### Automated synching with cron
