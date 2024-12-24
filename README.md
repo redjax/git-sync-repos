@@ -41,3 +41,11 @@ This will run the [`git_mirror_sync.sh`](./git_mirror_sync.sh) script every 30 m
 0 6,12,18,0 * * * /path/to/git-sync-repos/git_mirror_sync.sh
 
 ```
+
+### Add logging
+
+You can log the output of the git sync script by adding a log file path to the end of the crontab schedule:
+
+```bash
+*/30 * * * * /path/to/git-sync-repos/git_mirror_sync.sh >> /path/to/git_mirror_sync.log 2>&1
+```
