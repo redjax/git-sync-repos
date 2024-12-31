@@ -2,3 +2,22 @@ mirrors
 !mirrors.example
 repositories/
 *.log
+
+# Environments
+.env
+*.env
+*.*.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+## Allow Environment patterns
+!*example*
+!*example*.*
+!*.*example*
+!*.*example*.*
+!*.*.*example*
+!*.*.*example*.*
