@@ -1,4 +1,7 @@
 ---
+volumes:
+  git-sync_data: {}
+
 services:
   git-sync:
     container_name: git-sync
@@ -16,12 +19,9 @@ services:
       PGID: ${PGID:-1000}
     volumes:
       - ./mirrors:/git-sync/mirrors
-      - ./containers/git-sync/repositories:/git-sync/repositories
+      - ${GIT_SYNC_DATA_DIR:-git-sync_data}:/git-sync/repositories
       ## Mount host SSH directory in the container by default.
       #  Provide a different path to an SSH directory with a config file
       #  & SSH key(s) for the container to use.
       - ${SSH_DIR:-./containers/ssh}:/root/.ssh
-    command: |
-      bash ./git_mirror_sync.sh && \
-      echo "Sleeping for 3600 seconds..." && \
-      while true; do sleep 3600; done
+    command: bash -c "./git_mirror_sync.sh && echo 'Sleeping for ${SLEEP_SECONDS:-3600} second(s) between synchs...' && sleep ${SLEEP_SECONDS:-3600}"
