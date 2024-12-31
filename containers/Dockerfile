@@ -11,6 +11,7 @@ RUN apt-get update -y \
         ca-certificates \
         apt-transport-https \
         software-properties-common \
+        parallel \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
