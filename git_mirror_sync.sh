@@ -1,5 +1,8 @@
 ##!/bin/bash
 
+## Uncomment while debugging to show traces
+# set -x
+
 ## Set variable to path where script was launched from
 CWD=$(pwd)
 
@@ -48,11 +51,26 @@ push_new_remote() {
 
   cd "$MIRROR_DIR/$repo_name"
 
-  ## Ensure the remote target URL is set
-  git remote set-url --push origin "$target_repo"
+  # ## Ensure the remote target URL is set
+  # git remote set-url --push origin "$target_repo"
   
-  ## Push to target
-  git push --mirror
+  # ## Push to target
+  # git push --mirror
+
+  ## Change to the repository directory
+  if cd "$MIRROR_DIR/$repo_name"; then
+    ## Ensure the remote target URL is set for this specific repo
+    git remote set-url --push origin "$target_repo"
+
+    ## Push to the target repository
+    git push --mirror
+
+    ## Return to the script directory
+    cd - > /dev/null
+  else
+    echo "[ERROR] Failed to change to repository directory: $MIRROR_DIR/$repo_name"
+    return 1
+  fi
 }
 
 mirror() {
@@ -76,9 +94,15 @@ mirror() {
 }
 
 async_mirror() {
+  ## Export functions to parallel session
   export -f ensure_git_suffix
   export -f clone_repo
   export -f push_new_remote
+  ## Export environment variables to parallel session
+  export CWD
+  export SCRIPT_DIR
+  export MIRROR_DIR
+  export REPOS_FILE
 
   cat "$REPOS_FILE" | parallel -j 0 'src_repo=$(echo {} | cut -d " " -f1); target_repo=$(echo {} | cut -d " " -f2); src_repo=$(ensure_git_suffix "$src_repo"); target_repo=$(ensure_git_suffix "$target_repo"); clone_repo "$src_repo"; push_new_remote "$src_repo" "$target_repo"'
 }
