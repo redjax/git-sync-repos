@@ -12,6 +12,9 @@ MIRROR_DIR="${SCRIPT_DIR}/repositories"
 ## File containing source and target repository pairs
 REPOS_FILE="${SCRIPT_DIR}/mirrors"
 
+## Flip to 1 when GNU parallel is installed
+RUN_CONCURRENTLY=0
+
 ## Function to ensure git URL ends with .git
 ensure_git_suffix() {
   local repo_url="$1"
@@ -52,13 +55,7 @@ push_new_remote() {
   git push --mirror
 }
 
-## Main function
-main() {
-  if [[ ! -f "$REPOS_FILE" ]]; then
-    echo "[ERROR] Repository file not found: $REPOS_FILE"
-    exit 1
-  fi
-
+mirror() {
   ## Read each line in the file
   while IFS=" " read -r src_repo target_repo; do
     ## Skip empty lines and lines starting with '##'
@@ -76,6 +73,37 @@ main() {
     ## Push the repository to target
     push_new_remote "$src_repo" "$target_repo"
   done < "$REPOS_FILE"
+}
+
+async_mirror() {
+  export -f ensure_git_suffix
+  export -f clone_repo
+  export -f push_new_remote
+
+  cat "$REPOS_FILE" | parallel -j 0 'src_repo=$(echo {} | cut -d " " -f1); target_repo=$(echo {} | cut -d " " -f2); src_repo=$(ensure_git_suffix "$src_repo"); target_repo=$(ensure_git_suffix "$target_repo"); clone_repo "$src_repo"; push_new_remote "$src_repo" "$target_repo"'
+}
+
+## Main function
+main() {
+  if [[ ! -f "$REPOS_FILE" ]]; then
+    echo "[ERROR] Repository file not found: $REPOS_FILE"
+    exit 1
+  fi
+
+  if ! command -v parallel --version > /dev/null 2>&1; then
+    echo "[WARNING] GNU parallel is not installed. Operations will be run synchronously."
+    echo "          Install GNU parallel to run operations concurrently, resulting in"
+    echo "          faster execution."
+
+    mirror
+  else
+    echo "[INFO] GNU parallel detected. Git operations will be performed concurrently."
+    async_mirror
+  fi
+
+  if [[ $? -ne 0 ]]; then
+    echo "[WARNING] Mirror command returned a non-zero exit code: $?"
+  fi
 }
 
 ## Run main function
