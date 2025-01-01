@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
     build:
       context: .
-      dockerfile: ./containers/cron.Dockerfile
+      dockerfile: ./containers/Dockerfile
       args:
         DEBIAN_IMG_VERSION: ${CONTAINER_IMG_VER:-bookworm-slim}
     working_dir: /git-sync
