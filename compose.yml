@@ -3,12 +3,13 @@ volumes:
   git-sync_data: {}
 
 services:
+
   git-sync:
     container_name: git-sync
     restart: unless-stopped
     build:
       context: .
-      dockerfile: ./containers/Dockerfile
+      dockerfile: ./containers/cron.Dockerfile
       args:
         DEBIAN_IMG_VERSION: ${CONTAINER_IMG_VER:-bookworm-slim}
     working_dir: /git-sync
@@ -24,4 +25,5 @@ services:
       #  Provide a different path to an SSH directory with a config file
       #  & SSH key(s) for the container to use.
       - ${SSH_DIR:-./containers/ssh}:/root/.ssh
-    command: bash -c "./git_mirror_sync.sh && echo 'Sleeping for ${SLEEP_SECONDS:-3600} second(s) between synchs...' && sleep ${SLEEP_SECONDS:-3600}"
+    # command: bash -c "./git_mirror_sync.sh && echo 'Sleeping for ${SLEEP_SECONDS:-3600} second(s) between synchs...' && sleep ${SLEEP_SECONDS:-3600}"
+    command: bash -c "cron && tail -f /var/log/cron.log"

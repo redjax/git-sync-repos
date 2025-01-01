@@ -81,10 +81,19 @@ echo " [ Docker Entrypoint ${HOMEPATH}/.ssh permissions ]"
 echo " --------------------------------------------------"
 ls -l "${HOMEPATH}/.ssh"
 
+if [[ ! -f "/var/log/cron.log" ]]; then
+    echo "/var/log/cron.log does not exist yet. Creating empty file for cron to write logs to."
+
+    mkdir -pv /var/log
+    touch /var/log/cron.log
+    chmod 666 /var/log/cron.log
+fi
+
 if [[ $? -ne 0 ]]; then
     echo "[ERROR] An error occurred during Docker entrypoint startup."
     exit $?
 else
+    echo "Starting cron container. Depending on your cron schedule, you may see this message for a while before any output. Just be patient :)"
     ## Continue with Docker command execution
     exec "$@"
 fi

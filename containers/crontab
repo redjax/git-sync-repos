@@ -1,0 +1,22 @@
+####################
+# Crontab Schedule #
+# ---------------- ###########################################
+# Instructions: Choose 1 schedule below to uncomment.        #
+# When the container runs, it will load this file into the   #
+# cron directory and start the schedule.                     #
+#                                                            #
+# If you uncomment more than 1 line, the script will run for #
+# each uncommented schedule                                  #
+##############################################################
+
+## Once per day at midnight
+0 0 * * * /git-sync/git_mirror_sync.sh > /proc/1/fd/1 2>/proc/1/fd/2
+
+## Once per hour at minute 0
+0 * * * * /git-sync/git_mirror_sync.sh > /proc/1/fd/1 2>/proc/1/fd/2
+
+## Every half hour
+# */30 * * * * /git-sync/git_mirror_sync.sh > /proc/1/fd/1 2>/proc/1/fd/2
+
+## Every minute of every hour between 1a-5a, 12p-4p, 8p-12a
+# 0 1-5,12-16,20-23 * * * /git-sync/git_mirror_sync.sh > /proc/1/fd/1 2>/proc/1/fd/2
