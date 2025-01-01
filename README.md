@@ -8,10 +8,15 @@ Includes a [Docker container](./containers/Dockerfile) and [Docker Compose file]
 
 Before running this script, make sure your repositories are public, or that you've added a public SSH key to both the source and target repository. Instructions for adding your SSH key [to Github](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account), [to Codeberg](https://docs.codeberg.org/security/ssh-key/), and [to Gitlab](https://docs.gitlab.com/ee/user/ssh.html).
 
-- Copy [`mirrors.example`](./mirrors.example) to `mirrors` (this file should not have a file extension).
-  - Edit `mirrors`, deleting the examples and adding your own mirror pairs.
-- Run the [`git_mirror_sync.sh`](./git_mirror_sync.sh) or [`git_mirror_sync.ps1`](./git_mirror_sync.ps1) script.
-  - The script will read the `mirrors` file, create a `./repositories/` path, and clone each repository source, then mirror to the target.
+**Note**: The [Docker container](./containers/Dockerfile) expects your SSH key to be named ``. You can generate an SSH key with:
+
+```shell
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/git_mirror_id_rsa -N ""
+```
+
+This will create an SSH key in your home directory, under the `.ssh/` directory, named `git_mirror_id_rsa`. You will also see a `git_mirror_id_rsa.pub`; copy the contents of your `.pub` public key into your git repositories (Github, Gitlab, Codeberg, etc).
+
+You also need to create a copy of [`mirrors.example`](./mirrors.example) named `mirrors` (this file should not have a file extension). Edit `mirrors`, deleting the examples and adding your own mirror pairs.
 
 ### Automated synching with cron
 
@@ -44,6 +49,12 @@ This will run the [`git_mirror_sync.sh`](./git_mirror_sync.sh) script every 30 m
 ## Four times a day
 0 6,12,18,0 * * * /path/to/git-sync-repos/git_mirror_sync.sh
 
+## Once per hour
+@hourly * * * * /path/to/git-sync-repos/git_mirror_sync.sh
+
+## Once daily
+@daily * * * * /path/to/git-sync-repos/git_mirror_sync.sh
+
 ```
 
 ### Add logging
@@ -62,4 +73,4 @@ To run the container, build it with `docker compose build`, then run `docker com
 
 If you want to change any of the defaults, such as the SSH directory mounted in the container, the path to data files on the host, or anything else, you can copy the [example `.env` file](./.env.example) to `.env` and edit the variables before running.
 
-The script sleeps for 1 hour between executions. To change this, modify the `sleep 3600` line in the `compose.yml` file.
+The script calls a [crontab schedule](./containers/crontab) to run the script on a schedule you choose.
