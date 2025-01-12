@@ -40,6 +40,6 @@ RUN chmod u+x /docker-entrypoint.sh /git-sync/git_mirror_sync.sh
 ## Declare volume mounts for Docker compose and docker -v
 VOLUME ["/root/.ssh", "/git-sync"]
 
-ENTRYPOINT [ "/docker-entrypoint.sh" ]
+ENTRYPOINT [ "/bin/bash", "/docker-entrypoint.sh" ]
 # CMD ["sleep", "infinity"]
 CMD ["cron && tail -f /var/log/cron.log"]
