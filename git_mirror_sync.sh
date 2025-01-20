@@ -7,7 +7,7 @@
 CWD=$(pwd)
 
 # Change to the directory where the script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 cd $SCRIPT_DIR || exit 1
 
 ## Set working directory for mirrors
@@ -17,6 +17,11 @@ REPOS_FILE="${SCRIPT_DIR}/mirrors"
 
 ## Flip to 1 when GNU parallel is installed
 RUN_CONCURRENTLY=0
+
+echo "[DEBUG] CWD=${CWD}"
+echo "[DEBUG] SCRIPT_DIR=${SCRIPT_DIR}"
+echo "[DEBUG] MIRROR_DIR=${MIRROR_DIR}"
+echo "[DEBUG] REPOS_FILE=${REPOS_FILE}"
 
 ## Function to ensure git URL ends with .git
 ensure_git_suffix() {
@@ -128,7 +133,7 @@ main() {
     exit 1
   fi
 
-  if ! command -v parallel --version > /dev/null 2>&1; then
+  if ! command -v parallel --version &> /dev/null; then
     echo "[WARNING] GNU parallel is not installed. Operations will be run synchronously."
     echo "          Install GNU parallel to run operations concurrently, resulting in"
     echo "          faster execution."
