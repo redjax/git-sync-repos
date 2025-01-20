@@ -37,8 +37,22 @@ clone_repo() {
     echo "Cloning repository $repo_url into $MIRROR_DIR/$repo_name"
     git clone --mirror "$repo_url" "$MIRROR_DIR/$repo_name"
   else
-    echo "Repository $repo_name already exists. Skipping clone."
+    echo "Repository $repo_name already exists. Skipping clone & pulling changes."
+    
+    cd "$MIRROR_DIR/$repo_name"
+    if [[ $? -ne 0 ]]; then
+      echo "[ERROR] Could not change path to '$MIRROR_DIR/$repo_name'."
+    else
+      echo "Pulling changes in fast-forward mode."
+      git pull --ff
+
+      if [[ $? -ne 0 ]]; then
+        echo "[ERROR] Unable to pull changes for '$MIRROR_DIR/$repo_name'"
+      fi
+    fi
   fi
+
+  cd $CWD
 }
 
 ## Function to mirror repositories between source and target
