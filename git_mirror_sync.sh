@@ -11,17 +11,23 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 cd $SCRIPT_DIR || exit 1
 
 ## Set working directory for mirrors
-MIRROR_DIR="${SCRIPT_DIR}/repositories"
+MIRROR_DIR="${GIT_SYNC_MIRROR_DIR:-$SCRIPT_DIR}/repositories"
 ## File containing source and target repository pairs
 REPOS_FILE="${SCRIPT_DIR}/mirrors"
 
 ## Flip to 1 when GNU parallel is installed
 RUN_CONCURRENTLY=0
 
-echo "[DEBUG] CWD=${CWD}"
-echo "[DEBUG] SCRIPT_DIR=${SCRIPT_DIR}"
-echo "[DEBUG] MIRROR_DIR=${MIRROR_DIR}"
-echo "[DEBUG] REPOS_FILE=${REPOS_FILE}"
+echo "$(cat <<EOF
+
+[ DEBUG Script Variables ]
+\$CWD=${CWD}
+\$SCRIPT_DIR=${SCRIPT_DIR}
+\$MIRROR_DIR=${MIRROR_DIR}
+\$REPOS_FILE=${REPOS_FILE}
+ 
+EOF
+)"
 
 ## Function to ensure git URL ends with .git
 ensure_git_suffix() {
