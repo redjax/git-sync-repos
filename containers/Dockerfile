@@ -36,7 +36,7 @@ WORKDIR /git-sync
 
 COPY ./git_mirror_sync.sh /git-sync/git_mirror_sync.sh
 COPY ./containers/docker-entrypoint.sh /docker-entrypoint.sh
-COPY ./containers/crontab /etc/cron.d/cron_schedule.cron
+COPY ./containers/crontabs/default.cron /etc/cron.d/cron_schedule.cron
 
 ## Create directory where git repos will be cloned
 RUN mkdir -p /git-sync/repositories
