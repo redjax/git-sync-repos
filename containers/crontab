@@ -12,13 +12,14 @@
 ###########################
 # Debug - once per minute #
 ###########################
-* * * * * /bin/bash /git-sync/git_mirror_sync.sh > /proc/1/fd/1 && 2>/proc/1/fd/2
+# * * * * * /bin/bash /git-sync/git_mirror_sync.sh 2>&1 | tee -a /var/log/cron.log > /proc/1/fd/1
 
 ## Once per day at midnight
-0 0 * * * /bin/bash /git-sync/git_mirror_sync.sh > /proc/1/fd/1 && 2>/proc/1/fd/2
+0 0 * * * /bin/bash /git-sync/git_mirror_sync.sh >&1 | tee -a /var/log/cron.daily.log > /proc/1/fd/1
 
 ## Once per hour at minute 0
-0 * * * * /bin/bash /git-sync/git_mirror_sync.sh > /proc/1/fd/1 && 2>/proc/1/fd/2
+0 * * * * /bin/bash /git-sync/git_mirror_sync.sh >&1 | tee -a /var/log/cron.hourly.log > /proc/1/fd/1
+
 #  Another way of writing 'once per hour'
 # @hourly /bin/bash /git-sync/git_mirror_sync.sh > /proc/1/fd/1 2>/proc/1/fd/2
 

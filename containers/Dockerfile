@@ -14,8 +14,21 @@ RUN apt-get update -y \
         parallel \
         cron \
         vim \
+        logrotate \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
+
+## Create logrotate rule to rotate cron.log
+RUN echo $'/var/log/cron.*.log { \
+daily \
+rotate 7 \
+compress \
+delaycompress \
+missingok \
+notifempty \
+create 0666 root root \
+} \
+' > /etc/logrotate.d/cron
 
 FROM base AS stage
 
