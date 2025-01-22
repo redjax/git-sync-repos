@@ -2,8 +2,8 @@
 
 CWD=$(pwd)
 
-CONTAINER_NAME=${GIT_SYNC_REPOS_CONTAINER_NAME:-git-sync}
-COMPOSE_FILE=${GIT_SYNC_REPOS_COMPOSE_FILE:-compose.yml}
+CONTAINER_NAME=${CONTAINER_NAME:-git-sync}
+COMPOSE_FILE=${COMPOSE_FILE:-compose.yml}
 
 if ! command -v docker compose 2>&1; then
     echo "docker compose is not installed."
