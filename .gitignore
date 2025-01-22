@@ -27,3 +27,6 @@ venv.bak/
 .direnv/**/.*
 !.direnv/*.*example*
 
+## Misc
+*.bak
+
