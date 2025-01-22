@@ -32,28 +32,28 @@ This will run the [`git_mirror_sync.sh`](./git_mirror_sync.sh) script every 30 m
 
 ```bash
 ## Once a day at 2am
-0 2 * * *  /path/to/git-sync-repos/git_mirror_sync.sh
+0 2 * * *  /bin/bash /path/to/git-sync-repos/git_mirror_sync.sh
 
 ## Once a week on Sunday at 3am
-0 3 * * 0 /path/to/git-sync-repos/git_mirror_sync.sh
+0 3 * * 0 /bin/bash /path/to/git-sync-repos/git_mirror_sync.sh
 
 ### Once a month on the 1st day of the month at 4am
-0 4 1 * * /path/to/git-sync-repos/git_mirror_sync.sh
+0 4 1 * * /bin/bash /path/to/git-sync-repos/git_mirror_sync.sh
 
 ## Once an hour
-0 * * * * /path/to/git-sync-repos/git_mirror_sync.sh
+0 * * * * /bin/bash /path/to/git-sync-repos/git_mirror_sync.sh
 
 ## Twice a day
-0 9,17 * * * /path/to/git-sync-repos/git_mirror_sync.sh
+0 9,17 * * * /bin/bash /path/to/git-sync-repos/git_mirror_sync.sh
 
 ## Four times a day
-0 6,12,18,0 * * * /path/to/git-sync-repos/git_mirror_sync.sh
+0 6,12,18,0 * * * /bin/bash /path/to/git-sync-repos/git_mirror_sync.sh
 
 ## Once per hour
-@hourly * * * * /path/to/git-sync-repos/git_mirror_sync.sh
+@hourly * * * * /bin/bash /path/to/git-sync-repos/git_mirror_sync.sh
 
 ## Once daily
-@daily * * * * /path/to/git-sync-repos/git_mirror_sync.sh
+@daily * * * * /bin/bash /path/to/git-sync-repos/git_mirror_sync.sh
 
 ```
 

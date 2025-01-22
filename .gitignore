@@ -21,3 +21,9 @@ venv.bak/
 !*.*example*.*
 !*.*.*example*
 !*.*.*example*.*
+
+## Ignore direnv environment files
+.direnv/.*
+.direnv/**/.*
+!.direnv/*.*example*
+

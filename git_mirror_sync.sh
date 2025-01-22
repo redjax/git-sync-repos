@@ -7,16 +7,27 @@
 CWD=$(pwd)
 
 # Change to the directory where the script is located
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 cd $SCRIPT_DIR || exit 1
 
 ## Set working directory for mirrors
-MIRROR_DIR="${SCRIPT_DIR}/repositories"
+MIRROR_DIR="${GIT_SYNC_MIRROR_DIR:-$SCRIPT_DIR}/repositories"
 ## File containing source and target repository pairs
 REPOS_FILE="${SCRIPT_DIR}/mirrors"
 
 ## Flip to 1 when GNU parallel is installed
 RUN_CONCURRENTLY=0
+
+echo "$(cat <<EOF
+
+[ DEBUG Script Variables ]
+\$CWD=${CWD}
+\$SCRIPT_DIR=${SCRIPT_DIR}
+\$MIRROR_DIR=${MIRROR_DIR}
+\$REPOS_FILE=${REPOS_FILE}
+ 
+EOF
+)"
 
 ## Function to ensure git URL ends with .git
 ensure_git_suffix() {
@@ -37,8 +48,22 @@ clone_repo() {
     echo "Cloning repository $repo_url into $MIRROR_DIR/$repo_name"
     git clone --mirror "$repo_url" "$MIRROR_DIR/$repo_name"
   else
-    echo "Repository $repo_name already exists. Skipping clone."
+    echo "Repository $repo_name already exists. Skipping clone & pulling changes."
+    
+    cd "$MIRROR_DIR/$repo_name"
+    if [[ $? -ne 0 ]]; then
+      echo "[ERROR] Could not change path to '$MIRROR_DIR/$repo_name'."
+    else
+      echo "Pulling changes in fast-forward mode."
+      git pull --ff
+
+      if [[ $? -ne 0 ]]; then
+        echo "[ERROR] Unable to pull changes for '$MIRROR_DIR/$repo_name'"
+      fi
+    fi
   fi
+
+  cd $CWD
 }
 
 ## Function to mirror repositories between source and target
@@ -114,7 +139,7 @@ main() {
     exit 1
   fi
 
-  if ! command -v parallel --version > /dev/null 2>&1; then
+  if ! command -v parallel --version &> /dev/null; then
     echo "[WARNING] GNU parallel is not installed. Operations will be run synchronously."
     echo "          Install GNU parallel to run operations concurrently, resulting in"
     echo "          faster execution."

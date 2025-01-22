@@ -1,6 +1,7 @@
 ---
 volumes:
   git-sync_data: {}
+  git-sync_logs: {}
 
 services:
 
@@ -13,7 +14,6 @@ services:
       args:
         DEBIAN_IMG_VERSION: ${CONTAINER_IMG_VER:-bookworm-slim}
     working_dir: /git-sync
-    # user: "1000:1000"
     environment:
       TZ: ${TZ:-Etc/UTC}
       PUID: ${PUID:-1000}
@@ -25,6 +25,10 @@ services:
       #  Provide a different path to an SSH directory with a config file
       #  & SSH key(s) for the container to use.
       - ${SSH_DIR:-./containers/ssh}:/root/.ssh
-    command: bash -c "cron && tail -f /var/log/cron.log"
+      ## Mount a crontab script inside the container
+      - ${CRONTAB_FILE:-./containers/crontabs/default.cron}:/etc/cron.d/cron_schedule.cron:ro
+      ## Mount logs dir for persistence
+      - git-sync_logs:/var/log
+    command: /bin/bash -c "cat /etc/cron.d/cron_schedule.cron | crontab - && cron -f"
     ## Uncomment for debugging, comment the command above
     # command: sleep infinity
