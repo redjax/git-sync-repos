@@ -9,8 +9,8 @@ services:
     container_name: git-sync
     restart: unless-stopped
     build:
-      context: .
-      dockerfile: ./containers/Dockerfile
+      context: ..
+      dockerfile: ./containers/dockerfiles/Dockerfile
       args:
         DEBIAN_IMG_VERSION: ${CONTAINER_IMG_VER:-bookworm-slim}
     working_dir: /git-sync
@@ -19,14 +19,14 @@ services:
       PUID: ${PUID:-1000}
       PGID: ${PGID:-1000}
     volumes:
-      - ./mirrors:/git-sync/mirrors
+      - ../mirrors:/git-sync/mirrors
       - ${GIT_SYNC_DATA_DIR:-git-sync_data}:/git-sync/repositories
       ## Mount host SSH directory in the container by default.
       #  Provide a different path to an SSH directory with a config file
       #  & SSH key(s) for the container to use.
-      - ${SSH_DIR:-./containers/ssh}:/root/.ssh
+      - ${SSH_DIR:-../containers/ssh}:/root/.ssh
       ## Mount a crontab script inside the container
-      - ${CRONTAB_FILE:-./containers/crontabs/default.cron}:/etc/cron.d/cron_schedule.cron:ro
+      - ${CRONTAB_FILE:-../containers/crontabs/default.cron}:/etc/cron.d/cron_schedule.cron:ro
       ## Mount logs dir for persistence
       - git-sync_logs:/var/log
     command: /bin/bash -c "cat /etc/cron.d/cron_schedule.cron | crontab - && cron -f"
