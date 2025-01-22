@@ -26,7 +26,7 @@ services:
       #  & SSH key(s) for the container to use.
       - ${SSH_DIR:-./containers/ssh}:/root/.ssh
       ## Mount a crontab script inside the container
-      - ${CRONTAB_FILE:-./containers/crontab}:/etc/cron.d/cron_schedule.cron:ro
+      - ${CRONTAB_FILE:-./containers/crontabs/default.cron}:/etc/cron.d/cron_schedule.cron:ro
       ## Mount logs dir for persistence
       - git-sync_logs:/var/log
     command: /bin/bash -c "cat /etc/cron.d/cron_schedule.cron | crontab - && cron -f"
