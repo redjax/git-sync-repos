@@ -25,6 +25,7 @@ services:
       #  Provide a different path to an SSH directory with a config file
       #  & SSH key(s) for the container to use.
       - ${SSH_DIR:-./containers/ssh}:/root/.ssh
-    command: /bin/bash -c "cron && tail -f /var/log/cron.log"
+    # command: /bin/bash -c "cron -f && tail -f /var/log/cron.log"
+    command: /bin/bash -c "cat /etc/cron.d/cron_schedule.cron | crontab - && cron -f"
     ## Uncomment for debugging, comment the command above
     # command: sleep infinity

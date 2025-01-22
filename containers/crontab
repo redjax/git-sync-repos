@@ -9,11 +9,16 @@
 # each uncommented schedule                                  #
 ##############################################################
 
+###########################
+# Debug - once per minute #
+###########################
+* * * * * /bin/bash /git-sync/git_mirror_sync.sh > /proc/1/fd/1 && 2>/proc/1/fd/2
+
 ## Once per day at midnight
-0 0 * * * /bin/bash /git-sync/git_mirror_sync.sh > /proc/1/fd/1 2>/proc/1/fd/2
+0 0 * * * /bin/bash /git-sync/git_mirror_sync.sh > /proc/1/fd/1 && 2>/proc/1/fd/2
 
 ## Once per hour at minute 0
-0 * * * * /bin/bash /git-sync/git_mirror_sync.sh > /proc/1/fd/1 2>/proc/1/fd/2
+0 * * * * /bin/bash /git-sync/git_mirror_sync.sh > /proc/1/fd/1 && 2>/proc/1/fd/2
 #  Another way of writing 'once per hour'
 # @hourly /bin/bash /git-sync/git_mirror_sync.sh > /proc/1/fd/1 2>/proc/1/fd/2
 

@@ -23,7 +23,7 @@ WORKDIR /git-sync
 
 COPY ./git_mirror_sync.sh /git-sync/git_mirror_sync.sh
 COPY ./containers/docker-entrypoint.sh /docker-entrypoint.sh
-COPY ./containers/crontab /etc/cron.d/cron_schedule
+COPY ./containers/crontab /etc/cron.d/cron_schedule.cron
 
 ## Create directory where git repos will be cloned
 RUN mkdir -p /git-sync/repositories
@@ -31,7 +31,7 @@ RUN mkdir -p /git-sync/repositories
 FROM stage AS run
 COPY --from=stage /git-sync /git-sync
 COPY --from=stage /docker-entrypoint.sh /docker-entrypoint.sh
-COPY --from=stage /etc/cron.d/cron_schedule /etc/cron.d/cron_schedule
+COPY --from=stage /etc/cron.d/cron_schedule.cron /etc/cron.d/cron_schedule.cron
 
 WORKDIR /git-sync
 
@@ -40,6 +40,8 @@ RUN chmod u+x /docker-entrypoint.sh /git-sync/git_mirror_sync.sh
 ## Declare volume mounts for Docker compose and docker -v
 VOLUME ["/root/.ssh", "/git-sync"]
 
+RUN chmod 644 /etc/cron.d/cron_schedule.cron
+
 ENTRYPOINT [ "/bin/bash", "/docker-entrypoint.sh" ]
 # CMD ["sleep", "infinity"]
-CMD ["cron && tail -f /var/log/cron.log"]
+CMD ["/bin/bash", "-c", "cat /etc/cron.d/cron_schedule.cron | crontab - && cron -f"]
