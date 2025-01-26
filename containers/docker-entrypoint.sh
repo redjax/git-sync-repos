@@ -96,4 +96,7 @@ else
     echo "Starting cron container. Depending on your cron schedule, you may see this message for a while before any output. Just be patient :)"
     ## Continue with Docker command execution
     exec "$@"
+
+    echo "[DEBUG] Docker exit code: $?"
+    exit $?
 fi
