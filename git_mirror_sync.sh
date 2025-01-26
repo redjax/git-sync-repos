@@ -18,9 +18,17 @@ REPOS_FILE="${SCRIPT_DIR}/mirrors"
 ## Flip to 1 when GNU parallel is installed
 RUN_CONCURRENTLY=0
 
+function get_ts() {
+  ## Return a formatted timestamp.
+  #  Format: $1 or %Y-%m-%d %H:%M:%S
+  fmt="${1:-%Y-%m-%d %H:%M:%S}"
+
+  date "+${fmt}"
+}
+
 echo "$(cat <<EOF
 
-[ DEBUG Script Variables ]
+[$(get_ts)] [ DEBUG Script Variables ]
 \$CWD=${CWD}
 \$SCRIPT_DIR=${SCRIPT_DIR}
 \$MIRROR_DIR=${MIRROR_DIR}
@@ -45,20 +53,20 @@ clone_repo() {
 
   ## Clone if the repository does not exist
   if [[ ! -d "$MIRROR_DIR/$repo_name" ]]; then
-    echo "Cloning repository $repo_url into $MIRROR_DIR/$repo_name"
+    echo "[$(get_ts)] Cloning repository $repo_url into $MIRROR_DIR/$repo_name"
     git clone --mirror "$repo_url" "$MIRROR_DIR/$repo_name"
   else
-    echo "Repository $repo_name already exists. Skipping clone & pulling changes."
+    echo "[$(get_ts)] Repository $repo_name already exists. Skipping clone & pulling changes."
     
     cd "$MIRROR_DIR/$repo_name"
     if [[ $? -ne 0 ]]; then
-      echo "[ERROR] Could not change path to '$MIRROR_DIR/$repo_name'."
+      echo "[$(get_ts)] [ERROR] Could not change path to '$MIRROR_DIR/$repo_name'."
     else
-      echo "Pulling changes in fast-forward mode."
+      echo "[$(get_ts)] Pulling changes in fast-forward mode."
       git pull --ff
 
       if [[ $? -ne 0 ]]; then
-        echo "[ERROR] Unable to pull changes for '$MIRROR_DIR/$repo_name'"
+        echo "[$(get_ts)] [ERROR] Unable to pull changes for '$MIRROR_DIR/$repo_name'"
       fi
     fi
   fi
@@ -72,7 +80,7 @@ push_new_remote() {
   local target_repo="$2"
   local repo_name=$(basename "$src_repo" .git)
 
-  echo "Mirroring from $src_repo to $target_repo"
+  echo "[$(get_ts)] Mirroring from $src_repo to $target_repo"
 
   cd "$MIRROR_DIR/$repo_name"
 
@@ -93,7 +101,7 @@ push_new_remote() {
     ## Return to the script directory
     cd - > /dev/null
   else
-    echo "[ERROR] Failed to change to repository directory: $MIRROR_DIR/$repo_name"
+    echo "[$(get_ts)] [ERROR] Failed to change to repository directory: $MIRROR_DIR/$repo_name"
     return 1
   fi
 }
@@ -123,6 +131,7 @@ async_mirror() {
   export -f ensure_git_suffix
   export -f clone_repo
   export -f push_new_remote
+  export -f get_ts
   ## Export environment variables to parallel session
   export CWD
   export SCRIPT_DIR
@@ -135,23 +144,23 @@ async_mirror() {
 ## Main function
 main() {
   if [[ ! -f "$REPOS_FILE" ]]; then
-    echo "[ERROR] Repository file not found: $REPOS_FILE"
+    echo "[$(get_ts)] [ERROR] Repository file not found: $REPOS_FILE"
     exit 1
   fi
 
   if ! command -v parallel --version &> /dev/null; then
-    echo "[WARNING] GNU parallel is not installed. Operations will be run synchronously."
+    echo "[$(get_ts)] [WARNING] GNU parallel is not installed. Operations will be run synchronously."
     echo "          Install GNU parallel to run operations concurrently, resulting in"
     echo "          faster execution."
 
     mirror
   else
-    echo "[INFO] GNU parallel detected. Git operations will be performed concurrently."
+    echo "[$(get_ts)] [INFO] GNU parallel detected. Git operations will be performed concurrently."
     async_mirror
   fi
 
   if [[ $? -ne 0 ]]; then
-    echo "[WARNING] Mirror command returned a non-zero exit code: $?"
+    echo "[$(get_ts)] [WARNING] Mirror command returned a non-zero exit code: $?"
   fi
 }
 
